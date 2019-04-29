@@ -1,0 +1,6 @@
+package:
+    type:       library
+    name:       hiqdev/recon-dns
+    title:      Recon module for DNS zone modification requests
+    keywords:   php, recon, dns
+
