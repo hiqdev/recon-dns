@@ -3,6 +3,7 @@
 namespace hiqdev\recon\dns\Command;
 
 use hiapi\commands\BaseCommand;
+use hiqdev\recon\core\Model\Service;
 use hiqdev\recon\dns\Model\Zone;
 
 /**
@@ -16,4 +17,9 @@ class CreateZoneCommand extends BaseCommand
      * @var Zone
      */
     public $zone;
+
+    /**
+     * @var Service
+     */
+    public $service;
 }
