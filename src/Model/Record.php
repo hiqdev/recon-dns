@@ -2,6 +2,7 @@
 
 namespace hiqdev\recon\dns\Model;
 
+use hiqdev\recon\dns\Helper\NsHelper;
 use hiqdev\recon\dns\Validator\DomainPartValidator;
 use hiqdev\recon\dns\Validator\FqdnValueValidator;
 use hiqdev\recon\dns\Validator\MxValueValidator;
@@ -185,5 +186,26 @@ class Record extends Model
             /* @var $model Record */
             return $not xor \in_array($model->type, (array)$type, true);
         };
+    }
+
+    public function typeIs(string $type): bool
+    {
+        return $this->type === $type;
+    }
+
+    public function canonicalFqdn(): string
+    {
+        return NsHelper::canonical($this->fqdn);
+    }
+
+    public function canonicalValue(): string
+    {
+        switch ($this->type) {
+            case self::NS:
+            case self::MX:
+                return NsHelper::canonical($this->value);
+            default:
+                return $this->value;
+        }
     }
 }

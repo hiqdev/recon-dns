@@ -9,11 +9,11 @@ use yii\base\Model;
  *
  * @author Dmytro Naumenko <d.naumenko.a@gmail.com>
  *
- * @property-read string $refresh
- * @property-read string $retry
- * @property-read string $expire
- * @property-read string $minimum
- * @property-read string $ttl
+ * @property-read integer $refresh
+ * @property-read integer $retry
+ * @property-read integer $expire
+ * @property-read integer $minimum
+ * @property-read integer $ttl
  * @property-read string $email
  */
 class Soa extends Model
@@ -41,10 +41,16 @@ class Soa extends Model
     {
         return [
             [['refresh', 'retry', 'expire', 'minimum'], 'integer'],
-            /// TTL validation
-            [['ttl'], 'integer', 'max' => 86400],
-
             [['email'], 'email'],
+
+            // Defaults
+            [['ttl'], 'default', 'value' => 86400],
+            [['refresh'], 'default', 'value' => 3600],
+            [['retry'], 'default', 'value' => 1800],
+            [['expire'], 'default', 'value' => 604800],
+
+            // Limits
+            [['ttl'], 'integer', 'min' => 60, 'max' => 86400],
         ];
     }
 }
