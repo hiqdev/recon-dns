@@ -4,6 +4,7 @@ namespace hiqdev\recon\dns\Command;
 
 use hiapi\commands\BaseCommand;
 use hiqdev\recon\core\Model\Service;
+use hiqdev\recon\core\Model\ServiceAwareInterface;
 use hiqdev\recon\dns\Model\Zone;
 
 /**
@@ -11,7 +12,7 @@ use hiqdev\recon\dns\Model\Zone;
  *
  * @author Dmytro Naumenko <d.naumenko.a@gmail.com>
  */
-class CreateZoneCommand extends BaseCommand
+class CreateZoneCommand extends BaseCommand implements ServiceAwareInterface
 {
     /**
      * @var Zone
@@ -22,4 +23,9 @@ class CreateZoneCommand extends BaseCommand
      * @var Service
      */
     public $service;
+
+    public function getService(): Service
+    {
+        return $this->service;
+    }
 }
