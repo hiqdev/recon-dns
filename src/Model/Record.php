@@ -202,8 +202,13 @@ class Record extends Model
     {
         switch ($this->type) {
             case self::NS:
-            case self::MX:
+            case self::SRV:
+            case self::CNAME:
                 return NsHelper::canonical($this->value);
+            case self::MX:
+                return $this->no . ' ' . NsHelper::canonical($this->value);
+            case self::TXT:
+                return '"' . addslashes($this->value) . '"';
             default:
                 return $this->value;
         }

@@ -58,4 +58,18 @@ class MxValueValidator extends FqdnValueValidator
             $model->$attribute = $matches[3];
         }
     }
+
+    /**
+     * @param string $value the IDN domain name that should be converted to ASCII
+     * @return string
+     */
+    public static function convertIdnToAscii(string $value): string
+    {
+        return idn_to_ascii($value, IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46);
+    }
+
+    public static function convertAsciiToIdn(string $value): string
+    {
+        return idn_to_utf8($value, IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46);
+    }
 }
