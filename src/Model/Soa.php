@@ -41,7 +41,7 @@ class Soa extends Model
     {
         return [
             [['refresh', 'retry', 'expire', 'minimum'], 'integer'],
-            [['email'], 'email'],
+            [['email'], 'email', 'enableIDN' => true],
 
             // Defaults
             [['ttl'], 'default', 'value' => 86400],

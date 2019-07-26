@@ -5,7 +5,7 @@ namespace hiqdev\recon\dns\Model;
 class Zone
 {
     /**
-     * @var string
+     * @var string The FQDN. Stores punycode for IDN
      */
     public $fqdn;
 

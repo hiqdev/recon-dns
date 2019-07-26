@@ -10,13 +10,13 @@ namespace hiqdev\recon\dns\Helper;
 final class NsHelper
 {
     /**
-     * Makes sure FQDN is canonical (has trailing dot)
+     * Makes sure FQDN is canonical (has trailing dot) as punycode
      *
      * @param string $fqdn
      * @return string
      */
     public static function canonical(string $fqdn): string
     {
-        return trim($fqdn, '.') . '.';
+        return idn_to_ascii(trim($fqdn, '.'), INTL_IDNA_VARIANT_UTS46) . '.';
     }
 }

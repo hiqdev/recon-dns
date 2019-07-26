@@ -118,6 +118,7 @@ class Record extends Model
             [
                 ['value'],
                 'email',
+                'enableIDN' => true,
                 'when' => $this->buildRuleWhen('soa'),
             ],
 
