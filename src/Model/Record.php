@@ -3,6 +3,7 @@
 namespace hiqdev\recon\dns\Model;
 
 use hiqdev\recon\dns\Helper\NsHelper;
+use hiqdev\recon\dns\Helper\TxtHelper;
 use hiqdev\recon\dns\Validator\DomainPartValidator;
 use hiqdev\recon\dns\Validator\FqdnValueValidator;
 use hiqdev\recon\dns\Validator\MxValueValidator;
@@ -125,6 +126,12 @@ class Record extends Model
             /// TXT
             [
                 ['value'],
+                'filter',
+                'filter' => [TxtHelper::class, 'normalize'],
+                'when' => $this->buildRuleWhen('txt'),
+            ],
+            [
+                ['value'],
                 TxtValueValidator::class,
                 'when' => $this->buildRuleWhen('txt'),
             ],
@@ -164,8 +171,9 @@ class Record extends Model
                 'when' => $this->buildRuleWhen('srv'),
             ],
 
-            /// No
-            [['no'], 'integer'],
+            /// No (MX priority is required)
+            [['no'], 'integer', 'min' => 0, 'max' => 65535],
+            [['no'], 'required', 'when' => $this->buildRuleWhen('mx')],
 
             /// For all:
             [['value', 'type', 'ttl'], 'required'],
@@ -209,7 +217,7 @@ class Record extends Model
             case self::MX:
                 return $this->no . ' ' . NsHelper::canonical($this->value);
             case self::TXT:
-                return '"' . addslashes($this->value) . '"';
+                return TxtHelper::toPresentation($this->value);
             default:
                 return $this->value;
         }
