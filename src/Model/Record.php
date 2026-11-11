@@ -81,7 +81,11 @@ class Record extends Model
             [['name', 'domain', 'type', 'fqdn', 'value'], 'trim'],
 
             /// TTL validation
+            /// No minimum here: zones already hold shorter TTLs and a rejected record stops the whole zone
             [['ttl'], 'integer', 'max' => 86400],
+
+            /// The full name is limited to 253 characters, the trailing dot excluded
+            [['fqdn'], 'validateFqdnLength'],
 
             /// Name validations
             [
@@ -172,13 +176,21 @@ class Record extends Model
             ],
 
             /// No (MX priority is required)
-            [['no'], 'integer', 'min' => 0, 'max' => 65535],
+            [['no'], 'integer', 'min' => 1, 'max' => 65535, 'when' => $this->buildRuleWhen('mx')],
+            [['no'], 'integer', 'min' => 0, 'max' => 65535, 'when' => $this->buildRuleWhen('mx', true)],
             [['no'], 'required', 'when' => $this->buildRuleWhen('mx')],
 
             /// For all:
             [['value', 'type', 'ttl'], 'required'],
             [['id'], 'required'],
         ];
+    }
+
+    public function validateFqdnLength(string $attribute): void
+    {
+        if (\strlen(rtrim((string) $this->{$attribute}, '.')) > 253) {
+            $this->addError($attribute, 'Full name of the record is longer than 253 characters');
+        }
     }
 
     /**
