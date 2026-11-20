@@ -3,6 +3,7 @@
 namespace hiqdev\recon\dns\Model;
 
 use hiqdev\recon\dns\Helper\NsHelper;
+use hiqdev\recon\dns\Helper\TxtHelper;
 use hiqdev\recon\dns\Validator\DomainPartValidator;
 use hiqdev\recon\dns\Validator\FqdnValueValidator;
 use hiqdev\recon\dns\Validator\MxValueValidator;
@@ -80,7 +81,11 @@ class Record extends Model
             [['name', 'domain', 'type', 'fqdn', 'value'], 'trim'],
 
             /// TTL validation
+            /// No minimum here: zones already hold shorter TTLs and a rejected record stops the whole zone
             [['ttl'], 'integer', 'max' => 86400],
+
+            /// The full name is limited to 253 characters, the trailing dot excluded
+            [['fqdn'], 'validateFqdnLength'],
 
             /// Name validations
             [
@@ -125,6 +130,12 @@ class Record extends Model
             /// TXT
             [
                 ['value'],
+                'filter',
+                'filter' => [TxtHelper::class, 'normalize'],
+                'when' => $this->buildRuleWhen('txt'),
+            ],
+            [
+                ['value'],
                 TxtValueValidator::class,
                 'when' => $this->buildRuleWhen('txt'),
             ],
@@ -164,13 +175,22 @@ class Record extends Model
                 'when' => $this->buildRuleWhen('srv'),
             ],
 
-            /// No
-            [['no'], 'integer'],
+            /// No (MX priority is required)
+            [['no'], 'integer', 'min' => 1, 'max' => 65535, 'when' => $this->buildRuleWhen('mx')],
+            [['no'], 'integer', 'min' => 0, 'max' => 65535, 'when' => $this->buildRuleWhen('mx', true)],
+            [['no'], 'required', 'when' => $this->buildRuleWhen('mx')],
 
             /// For all:
             [['value', 'type', 'ttl'], 'required'],
             [['id'], 'required'],
         ];
+    }
+
+    public function validateFqdnLength(string $attribute): void
+    {
+        if (\strlen(rtrim((string) $this->{$attribute}, '.')) > 253) {
+            $this->addError($attribute, 'Full name of the record is longer than 253 characters');
+        }
     }
 
     /**
@@ -209,7 +229,7 @@ class Record extends Model
             case self::MX:
                 return $this->no . ' ' . NsHelper::canonical($this->value);
             case self::TXT:
-                return '"' . addslashes($this->value) . '"';
+                return TxtHelper::toPresentation($this->value);
             default:
                 return $this->value;
         }

@@ -20,5 +20,5 @@ class TxtValueValidator extends RegularExpressionValidator
     /**
      * {@inheritdoc}
      */
-    public $pattern = '/^[a-z0-9 _.*",?{}@!=:;\/+~\\-]+$/i';
+    public $pattern = '/^[\x20-\x7e]+$/';
 }
